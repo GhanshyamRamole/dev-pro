@@ -1,0 +1,16 @@
+# Application
+
+repo_dir: ""
+
+# Docker build
+image_name: ""
+image_tag: "latest"
+build_path: "{{ repo_dir }}"
+dockerfile_path: "Dockerfile"
+
+# Swarm service
+service_name: ""
+replicas: 5
+published_port: 3000
+target_port: 3000
+

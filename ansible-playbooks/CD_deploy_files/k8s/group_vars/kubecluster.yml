@@ -1,0 +1,11 @@
+# Environment Settings
+env_name: "prod"
+k8s_namespace: "default"
+manifest_path: "/home/{{ ansible_user }}/k8s-manifests"
+
+# Application Settings
+service_name: "taskapp-service"
+app_path: "/webapp"
+k8s_manifests:
+  - deployment.yml
+  - service.yml

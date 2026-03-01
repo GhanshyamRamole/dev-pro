@@ -1,0 +1,28 @@
+---
+- name: Install required tools on all nodes
+  hosts: all
+  become: true
+  roles:
+    - install_tools
+
+- name: Initialize Swarm Manager
+  hosts: Docker-Swarm
+  become: true
+  roles:
+    - swarm-manager
+
+- name: Join Worker Nodes
+  hosts: Workers
+  become: true
+  roles:
+    - swarm-worker
+
+- name: Build and Deploy Application
+  hosts: Docker-Swarm
+  become: yes
+  vars_files:
+    - vault.yml
+  roles:
+    - app-build
+    - app-service
+

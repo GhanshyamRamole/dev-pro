@@ -1,0 +1,19 @@
+---
+# tasks file for app-service
+
+
+- name: Create service if not exists
+  command: >
+    docker service create
+    --name {{ service_name }}
+    --replicas {{ replicas }}
+    --publish published={{ published_port }},target={{ target_port }}
+    {{ image_name }}:{{ image_tag }}
+  register: service_create
+  failed_when: false
+  changed_when: service_create.rc == 0
+
+- name: Scale service if exists
+  command: docker service scale {{ service_name }}={{ replicas }}
+  when: "'already exists' in service_create.stderr"
+

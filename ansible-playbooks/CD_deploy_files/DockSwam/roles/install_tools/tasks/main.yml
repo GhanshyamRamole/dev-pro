@@ -1,0 +1,26 @@
+---
+# tasks file for docker
+
+- name: Update system packages
+  yum:
+    name: "*"
+    state: latest
+
+- name: Install required packages
+  yum:
+    name: "{{ required_tools }}"
+    state: present
+    allowerasing: yes
+
+- name: Start and enable Docker
+  systemd:
+    name: "{{ services }}"
+    state: started
+    enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+

@@ -1,0 +1,10 @@
+---
+# vars file for docker
+
+
+required_tools:
+  - git 
+  - curl 
+  - docker
+
+services: docker

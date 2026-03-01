@@ -1,0 +1,5 @@
+project_path: "/opt/Docker"
+docker_user: "itadmin"
+dockerhub_username: "ghanshyamramole"
+image_name: "dev-pro"
+image_tag: "latest"

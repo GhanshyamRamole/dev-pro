@@ -1,0 +1,56 @@
+---
+- name: Managed Kubernetes Deployment
+  hosts: kubernetes
+  become: true
+  
+  vars_files:
+    - group_vars/kubecluster.yml
+
+  tasks:
+    - name: Prepare Deployment Environment
+      block:
+        - name: Ensure manifest directory exists
+          file:
+            path: "{{ manifest_path }}"
+            state: directory
+            mode: '0755'
+
+        - name: Copy manifests to the master node
+          copy:
+            src: "{{ item }}"
+            dest: "{{ manifest_path }}/"
+            mode: '0644'
+          loop: "{{ k8s_manifests }}"
+      tags: [ 'setup', 'prepare' ]
+
+    - name: Orchestrate K8s Resources
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ manifest_path }}/{{ item }}"
+        namespace: "{{ k8s_namespace }}"
+        wait: yes
+        wait_timeout: 300
+      loop: "{{ k8s_manifests }}"
+      tags: [ 'deploy' ]
+
+    - name: Post-Deployment Verification
+      block:
+        - name: Retrieve Service Details
+          kubernetes.core.k8s_info:
+            kind: Service
+            name: "{{ service_name }}"
+            namespace: "{{ k8s_namespace }}"
+          register: service_info
+          until: service_info.resources[0].status.loadBalancer.ingress is defined
+          retries: 10
+          delay: 15
+
+        - name: Display LoadBalancer Endpoint
+          debug:
+            msg: 
+              - "--------------------------------------------------------"
+              - "SUCCESS: Application deployed to {{ env_name | upper }}"
+              - "URL: http://{{ service_info.resources[0].status.loadBalancer.ingress[0].hostname }}{{ app_path }}"
+              - "--------------------------------------------------------"
+      tags: [ 'verify' ]
+      when: service_info is defined
