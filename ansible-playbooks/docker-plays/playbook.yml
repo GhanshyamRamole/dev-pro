@@ -4,6 +4,7 @@
   become: yes
   vars_files:
     - vars.yml
+    - passwd.yml
 
   tasks:
     - name: Installation of Docker 
@@ -44,7 +45,7 @@
     - name: Log in to Docker Hub
       docker_login:
         username: "{{ dockerhub_username }}"
-        password: "{{ lookup('file', 'pass.txt') }}"
+        password: "{{ dockerhub_password }}"
       become_user: "{{ docker_user }}"
 
     - name: Build and push Docker image
